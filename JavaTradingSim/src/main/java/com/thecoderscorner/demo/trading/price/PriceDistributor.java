@@ -2,14 +2,17 @@ package com.thecoderscorner.demo.trading.price;
 
 import com.thecoderscorner.demo.trading.staticdata.StaticDataService;
 import com.thecoderscorner.demo.trading.staticdata.StaticMessage;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.prefs.AbstractPreferences;
 
 @Slf4j
 public class PriceDistributor {
@@ -18,6 +21,7 @@ public class PriceDistributor {
     private final ScheduledFuture<?> priceTask;
     List<PriceMessage> priceMessages = new ArrayList<>(256);
     private StaticDataService staticDataService;
+    private final Sinks.Many<PricePojo> priceSink = Sinks.many().multicast().directBestEffort();
 
     public PriceDistributor(ScheduledExecutorService executorService,
                             PriceConflationService conflationService,
@@ -25,7 +29,11 @@ public class PriceDistributor {
         this.executorService = executorService;
         this.conflationService = conflationService;
         this.staticDataService = staticDataService;
-        priceTask = this.executorService.scheduleAtFixedRate(this::receiveChanges, 0, 1000, TimeUnit.MILLISECONDS);
+        priceTask = this.executorService.scheduleAtFixedRate(this::receiveChanges, 0, 200, TimeUnit.MILLISECONDS);
+    }
+
+    public Flux<PricePojo> getPriceFlux() {
+        return priceSink.asFlux();
     }
 
     public void stop() {
@@ -50,13 +58,22 @@ public class PriceDistributor {
             log.error("Failed to find instrument for ticker {}", price.getTicker());
             return;
         }
-        var ticks = price.getTickPrice().asLong();
-        var tpp = instrument.getTicksPerPoint();
-        var px = String.format("%d.%02d", ticks / tpp, ticks % tpp);
-        StringBuilder sb = new StringBuilder(512);
-        if(instrument.isBlocked()) sb.append("BLOCKED ");
-        if(instrument.isPreMarket()) sb.append("PRE-MARKET ");
-        log.info("SEND {} {} {} - {} rx at {} {} {}", price.getTicker(), price.getSource(), sb, px,
-                price.getMillisEpoch().asInstant(), instrument.getProductType(), instrument.getTradeableVenue());
+        priceSink.tryEmitNext(PricePojo.fromMsg(price, instrument));
+    }
+
+    @Value
+    @AllArgsConstructor
+    public static class PricePojo {
+        String ticker;
+        String price;
+        String source;
+
+        public static PricePojo fromMsg(PriceMessage price, StaticMessage instrument) {
+            var ticks = price.getTickPrice().asLong();
+            var tpp = instrument.getTicksPerPoint();
+            var px = String.format("%d.%02d", ticks / tpp, ticks % tpp);
+            //log.info("Price conversion for ticker {} to price {}", price.getTicker(), px);
+            return new PricePojo(price.getTicker().toString(), px, price.getSource().toString());
+        }
     }
 }
