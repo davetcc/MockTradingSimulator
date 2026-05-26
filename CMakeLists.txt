@@ -13,3 +13,10 @@ add_executable(MockTradingSimulator main.cpp)
 target_link_libraries(MockTradingSimulator
         PRIVATE
         MockSimNative)
+
+if(WIN32)
+    add_custom_command(TARGET MockTradingSimulator POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:MockSimNative>
+            $<TARGET_FILE_DIR:MockTradingSimulator>)
+endif()

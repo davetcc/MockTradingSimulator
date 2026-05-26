@@ -4,6 +4,17 @@
 #include <map>
 #include <random>
 
+// On Windows we need to export all the functions we may use.
+#if defined(_MSC_VER)
+  #ifdef MOCKSIMNATIVE_EXPORTS
+    #define TRADING_API __declspec(dllexport)
+  #else
+    #define TRADING_API __declspec(dllimport)
+  #endif
+#else
+  #define TRADING_API
+#endif
+
 #include "CircularBuffer.h"
 #include "MessageStructures.h"
 
@@ -13,7 +24,7 @@ constexpr const char* priceSourceNames[] = {"BBG", "RTRS", ourSourceName};
 constexpr int tickerSize = std::size(tickerNames);
 constexpr int priceSourcesSize = std::size(priceSourceNames);
 
-class TradingSystem {
+class TRADING_API TradingSystem {
 private:
     std::random_device randomDevice;
     std::mt19937_64 RandomNumberGen;

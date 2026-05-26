@@ -15,5 +15,11 @@ target_include_directories(MockSimNative
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR})
 
+target_compile_definitions(MockSimNative PRIVATE MOCKSIMNATIVE_EXPORTS)
+
+if(WIN32)
+    target_link_libraries(MockSimNative PRIVATE bcrypt)
+endif()
+
 set_target_properties(MockSimNative PROPERTIES
         OUTPUT_NAME "mocksimnative")
