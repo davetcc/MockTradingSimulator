@@ -9,8 +9,9 @@ The flow of the application is:
 
 ## Where it has been tested
 
-At the moment it has only been compiled against macOS, ARM64V8 AKA Apple Silicon using XCode Tools.
-Soon I will ensure it also builds and runs on Windows/MSVC and Linux gcc x86_64.
+* It has been compiled against macOS, ARM64V8 AKA Apple Silicon using XCode Tools.
+* It has been compiled on Windows using MSVC 26 Toolchain.
+* Soon I will ensure it also builds and runs on Linux gcc x86_64.
 
 ## Performance
 
