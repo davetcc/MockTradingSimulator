@@ -7,6 +7,11 @@ The flow of the application is:
 
 `C++ generate price -> Circular buffer -> Java price acquire -> Conflate Prices -> Price Distributor`
 
+## Where it has been tested
+
+At the moment it has only been compiled against macOS, ARM64V8 AKA Apple Silicon using XCode Tools.
+Soon I will ensure it also builds and runs on Windows/MSVC and Linux gcc x86_64.
+
 ## Performance
 
 I've tested the performance of the application and found that it can handle a high volume of price updates with 
