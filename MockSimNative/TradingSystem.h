@@ -3,6 +3,8 @@
 #define DAVESTEST_TRADINGSYSTEM_H
 #include <map>
 #include <random>
+#include <mutex>
+#include <thread>
 
 // On Windows we need to export all the functions we may use.
 #if defined(_MSC_VER)

@@ -2,6 +2,7 @@
 #define DAVESTEST_MESSAGESTRUCTURES_H
 
 #include <cstdint>
+#include <string>
 
 /**
  * A kind of marker interface that suggests a class has a binary representation that can be published as is. It generally

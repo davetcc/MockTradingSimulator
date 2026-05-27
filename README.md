@@ -5,7 +5,15 @@ parse struct based C++ messages while avoiding allocation.
 
 The flow of the application is:
 
-`C++ generate price -> Circular buffer -> Java price acquire -> Conflate Prices -> Price Distributor`
+```
+C++ generate price ->
+    C++ Circular buffer -> 
+        Panama Java price acquire -> 
+            Conflate Prices -> 
+                Price Distributor -> 
+                    Web Flux -> 
+                        React Web UI
+```
 
 ## Where it has been tested
 
@@ -20,8 +28,11 @@ minimal overhead, and no allocation in the critical flows.
 
 License: Apache 2.0
 
+## This project's purpose
+
 1. It allows me to test `byte-struct` functionality and performance.
 2. It serves as a learning tool for trading system development.
+3. It is a demonstration of my skills, showing that I can build a low-latency, high-throughput trading system. This was built in about 4 days so it has some unhandled edge cases.
 
 ## How to run this?
 
